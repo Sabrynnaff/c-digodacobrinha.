@@ -1,0 +1,88 @@
+// Variáveis globais
+var canvas;
+var ctx;
+var tamanhoBloco = 20;
+var pontuacao = 0;
+
+// Inicialização do jogo
+function iniciarJogo() {
+    canvas = document.getElementById("myCanvas");
+    ctx = canvas.getContext("2d");
+    document.addEventListener("keydown", teclaPressionada);
+    setInterval(desenharJogo, 100);
+}
+
+// Posição inicial da cobrinha
+var snake = [];
+snake[0] = { x: 10 * tamanhoBloco, y: 10 * tamanhoBloco };
+
+// Direção da cobrinha
+var direcao;
+
+// Controle de teclas
+function teclaPressionada(event) {
+    if (event.keyCode === 37 && direcao !== "right") {
+        direcao = "left";
+    } else if (event.keyCode === 38 && direcao !== "down") {
+        direcao = "up";
+    } else if (event.keyCode === 39 && direcao !== "left") {
+        direcao = "right";
+    } else if (event.keyCode === 40 && direcao !== "up") {
+        direcao = "down";
+    }
+}
+
+// Desenhar o jogo
+function desenharJogo() {
+    // Limpar o canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Movimento da cobrinha
+    var cabecaX = snake[0].x;
+    var cabecaY = snake[0].y;
+
+    if (direcao === "left") cabecaX -= tamanhoBloco;
+    if (direcao === "up") cabecaY -= tamanhoBloco;
+    if (direcao === "right") cabecaX += tamanhoBloco;
+    if (direcao === "down") cabecaY += tamanhoBloco;
+
+    // Verificar colisões
+    if (cabecaX < 0 || cabecaX >= canvas.width || cabecaY < 0 || cabecaY >= canvas.height || colisao(cabecaX, cabecaY, snake)) {
+        // Fim do jogo
+        return;
+    }
+
+    // Movimentar a cobrinha
+    var novaCabeca = { x: cabecaX, y: cabecaY };
+    snake.unshift(novaCabeca);
+
+    // Remover o último bloco da cobrinha
+    if (snake.length > pontuacao) {
+        snake.pop();
+    }
+
+    // Desenhar a cobrinha
+    for (var i = 0; i < snake.length; i++) {
+        desenharBloco(snake[i].x, snake[i].y);
+    }
+
+    // Desenhar a comida
+    desenharBloco(comida.x, comida.y);
+
+    // Verificar colisão com a comida
+    if (cabecaX === comida.x && cabecaY === comida.y) {
+        // Incrementar a pontuação e gerar nova comida
+        pontuacao++;
+        gerarComida();
+    }
+
+    // Atualizar a pontuação
+    ctx.fillStyle = "#000";
+    ctx.font = "20px Arial";
+    ctx.fillText("Pontuação: " + pontuacao, tamanhoBloco, tamanhoBloco);
+}
+
+// Desenhar um bloco
+function desenharBloco(x, y) {
+    ctx.fillStyle = "#00f";
+    ctx.fillRect(x, y, tamanhoBloco, tamanhoBlo
